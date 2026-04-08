@@ -304,37 +304,11 @@ struct SmartScanView: View {
     private var resultsBreakdown: some View {
         VStack(spacing: 8) {
             ForEach(vm.allResults) { result in
-                HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(result.category.color.opacity(0.15))
-                            .frame(width: 28, height: 28)
-
-                        Image(systemName: result.category.icon)
-                            .font(.system(size: 12))
-                            .foregroundColor(result.category.color)
+                ResultRow(result: result) {
+                    withAnimation(.pmSpring) {
+                        vm.selectedCategory = result.category
                     }
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(result.category.rawValue)
-                            .font(.pmBody)
-                            .foregroundColor(.pmTextPrimary)
-
-                        Text("\(result.itemCount) items")
-                            .font(.system(size: 10))
-                            .foregroundColor(.pmTextMuted)
-                    }
-
-                    Spacer()
-
-                    Text(result.formattedSize)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundColor(result.category.color)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.pmCard.opacity(0.4))
-                .cornerRadius(10)
             }
         }
         .frame(maxWidth: 450)
@@ -485,6 +459,65 @@ struct DiskStatCard: View {
         .frame(width: 100, height: 80)
         .background(Color.pmCard.opacity(0.5))
         .cornerRadius(12)
+    }
+}
+
+// MARK: - Result Row (Clickable)
+
+struct ResultRow: View {
+    let result: CategoryResult
+    let onTap: () -> Void
+
+    @State private var isHovering = false
+
+    var body: some View {
+        Button(action: onTap) {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(result.category.color.opacity(0.15))
+                        .frame(width: 28, height: 28)
+
+                    Image(systemName: result.category.icon)
+                        .font(.system(size: 12))
+                        .foregroundColor(result.category.color)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(result.category.rawValue)
+                        .font(.pmBody)
+                        .foregroundColor(.pmTextPrimary)
+
+                    Text("\(result.itemCount) items")
+                        .font(.system(size: 10))
+                        .foregroundColor(.pmTextMuted)
+                }
+
+                Spacer()
+
+                Text(result.formattedSize)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundColor(result.category.color)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(isHovering ? result.category.color : .pmTextMuted)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(isHovering ? Color.pmCardHover : Color.pmCard.opacity(0.4))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(isHovering ? result.category.color.opacity(0.3) : Color.clear, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .onHover { h in
+            withAnimation(.pmSmooth) { isHovering = h }
+        }
     }
 }
 

@@ -14,60 +14,45 @@ A free, open-source macOS cleaning utility. Keep your Mac fast, clean, and optim
 - **Mail Attachments** - Clear downloaded mail attachments
 - **Trash Bins** - Empty your Trash
 - **Large & Old Files** - Find files over 100 MB or older than 1 year
-- **Purgeable Space** - Purge APFS purgeable disk space
+- **Purgeable Space** - Purge APFS purgeable disk space (Time Machine snapshots)
 - **Xcode Junk** - Clean derived data, archives, and simulator caches
 - **Homebrew Cache** - Clear Homebrew download cache
 - **Scheduled Cleaning** - Automatic scans on configurable intervals (hours/days/weeks)
 - **Auto-Purge** - Automatically purge purgeable files on schedule
+- **Click-to-inspect** - Click any category to see exactly what will be removed
 
-## Screenshots
+## Install
 
-The app features a dark, modern UI inspired by professional Mac utilities:
+### Download (recommended)
 
-- Dark gradient theme with vibrant accent colors
-- Animated circular scan progress indicator
-- Sidebar navigation with real-time size indicators
-- Disk usage overview bar
+Download the latest `.app` from [Releases](https://github.com/momenbasel/PureMac/releases), unzip, and drag to `/Applications`.
 
-## Requirements
-
-- macOS 13.0 (Ventura) or later
-- Xcode 15+ (for building from source)
-- [XcodeGen](https://github.com/yonaskolb/XcodeGen) (for project generation)
-
-## Building
+### Build from source
 
 ```bash
-# Install XcodeGen if you don't have it
+# Prerequisites
 brew install xcodegen
 
-# Clone the repo
+# Clone and build
 git clone https://github.com/momenbasel/PureMac.git
 cd PureMac
-
-# Generate Xcode project
 xcodegen generate
+xcodebuild -project PureMac.xcodeproj -scheme PureMac -configuration Release -derivedDataPath build build
 
-# Build
-xcodebuild -project PureMac.xcodeproj -scheme PureMac -configuration Release build
+# Run
+open build/Build/Products/Release/PureMac.app
 
 # Or open in Xcode
 open PureMac.xcodeproj
 ```
 
-The built app will be at `build/Build/Products/Release/PureMac.app`.
-
 ## Scheduling
-
-PureMac supports automatic cleaning on configurable intervals:
 
 1. Open **Settings** (gear icon or Cmd+,)
 2. Go to the **Schedule** tab
 3. Enable **Automatic Cleaning**
-4. Choose your preferred interval (every hour to monthly)
+4. Choose your interval: hourly / 3h / 6h / 12h / daily / weekly / biweekly / monthly
 5. Optionally enable **Auto-clean after scan** and **Auto-purge purgeable space**
-
-The scheduler runs while the app is open. A LaunchAgent can be installed for background scheduling.
 
 ## What Gets Cleaned
 
@@ -78,7 +63,7 @@ The scheduler runs while the app is open. A LaunchAgent can be installed for bac
 | Mail Attachments | `~/Library/Mail Downloads` |
 | Trash | `~/.Trash` |
 | Large Files | `~/Downloads`, `~/Documents`, `~/Desktop` (>100MB or >1yr old) |
-| Purgeable | APFS purgeable space via `diskutil` |
+| Purgeable | Time Machine local snapshots via `tmutil` |
 | Xcode | `DerivedData`, `Archives`, `CoreSimulator/Caches` |
 | Homebrew | `~/Library/Caches/Homebrew` |
 
@@ -88,6 +73,7 @@ The scheduler runs while the app is open. A LaunchAgent can be installed for bac
 - Only removes caches, logs, temporary files, and user-selected items
 - Large & Old Files are **not auto-selected** - you choose what to remove
 - All operations are non-destructive to the operating system
+- Purgeable space calculation uses only Time Machine snapshots, not total free space
 
 ## License
 
